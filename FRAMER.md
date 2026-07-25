@@ -920,3 +920,34 @@ estilos do preset. Consequências:
 
 Tamanhos da Caveat (ela tem altura-x baixa e no mesmo px parece bem menor que a
 sans): **90 / 90 / 72 / 53** px, contra 70.4 / 70.4 / 56.4 / 41.2 da sans.
+
+### 14.4 CTAs intermediários e o link fantasma
+
+Dois CTAs no meio da página, nos momentos de maior intenção — não como seções
+novas, mas como uma linha discreta de texto + botão no fim do container:
+
+| Depois de | Texto |
+|---|---|
+| Condições | "Se reconheceu em algum desses? Vale investigar." |
+| Como é a consulta | "É simples assim. Vamos marcar a sua?" |
+
+Ficam logo após o momento em que a pessoa se identifica com um sintoma e logo após
+o medo do procedimento ser desfeito. No phone o par empilha.
+
+**Mapa final:** 6 CTAs apontam para `/#agendar` (header, menu mobile, hero,
+Condições, Como é a consulta, Sobre) e o WhatsApp direto existe em exatamente 2
+lugares (CTA final e rodapé).
+
+> ⚠️ **O link fantasma.** O botão do hero continuava indo para o WhatsApp mesmo com
+> o wrapper apontando para `/#agendar`. Causa: a instância guardava um
+> `$control__link="https://wa.me/..."` da **primeira montagem** — o frame raiz do
+> componente virava um link interno e vencia o do wrapper (âncora dentro de âncora).
+>
+> Isso expõe uma inconsistência real: na §9.1.2 o `$control__link` foi descartado em
+> silêncio; aqui ele **aplicou** em silêncio. **Não confie no comportamento nos dois
+> sentidos.** Ao mexer em links de botão, audite os dois níveis:
+> ```js
+> // link do nó (wrapper)      -> n.attributes.link.href
+> // controle da instância     -> n.attributes.$control__link
+> ```
+> Limpar: `SET <instância> $control__link="null";`
