@@ -29,6 +29,7 @@ variáveis CSS, layout em flex/grid simples, seções bem delimitadas.
 | Paleta / identidade | ✅ Aplicada via tokens CSS (ver `:root` em `css/styles.css`) |
 | CTA WhatsApp | ✅ `https://wa.me/5551995337479` em todos os botões |
 | Preview hospedado | ✅ https://claude.ai/code/artifact/bf7cf9fd-d5ac-4690-89f2-096bb9f495a0 |
+| Spec de migração | ✅ `FRAMER.md` — build completo, pronto para executar |
 | Logo DC oficial | ⚠️ **Pendente** — `assets/logo/dc-monogram.svg` é recriação aproximada |
 | Foto da Dra. | ⚠️ **Pendente** — `assets/img/portrait-placeholder.svg` é placeholder |
 | Migração para o Framer | ❌ **Bloqueada** — ver abaixo |
@@ -48,28 +49,56 @@ variáveis CSS, layout em flex/grid simples, seções bem delimitadas.
 **Onde travou:**
 `session new` falha com `Connection timeout after 90000ms`, porque a **política de
 rede do ambiente bloqueia todos os domínios do Framer**. O proxy retorna
-`403 CONNECT (policy denial)` para:
+`403 CONNECT (policy denial)`.
+
+**Reteste em 2026-07-25, em contêiner novo — continua bloqueado:**
 
 ```
-framer.com          api.framer.com
-edit.framer.com     framerusercontent.com
+framer.com  ·  www.framer.com  ·  api.framer.com
+edit.framer.com  ·  framerusercontent.com  ·  framer.wiki   → todos 403
+github.com · nodejs.org                                     → OK (controle)
 ```
 
 Isso **não deve ser contornado** (orientação explícita em `/root/.ccr/README.md`:
 negações de política se reportam, não se roteiam em volta).
 
+### ⚠️ Não é problema de conexão com o GitHub
+
+Confusão já levantada uma vez. São dois caminhos independentes:
+
+- **GitHub** usa um *proxy dedicado*, independente do nível de acesso à rede — por
+  isso clone/push funcionam mesmo com política restritiva.
+- **Framer** passa pelo *security proxy*, governado pelo **Network access** do
+  ambiente. É esse que devolve 403.
+
+O nível padrão é **Trusted**, cuja allowlist cobre npm, PyPI, GitHub e Docker Hub,
+mas **não o Framer**. Reconectar o GitHub não muda nada.
+
 **Como destravar — escolha um:**
 
-1. **Liberar os 4 hosts acima** na política de rede do ambiente de execução remota
-   (https://code.claude.com/docs/en/claude-code-on-the-web). A política é definida
-   na criação do ambiente, então provavelmente é preciso **iniciar uma sessão nova**
-   para a mudança valer.
+1. **Editar o ambiente** (ícone de nuvem → engrenagem) → **Network access** →
+   **Custom**, adicionando:
+   ```
+   framer.com
+   *.framer.com
+   framerusercontent.com
+   *.framerusercontent.com
+   ```
+   Manter marcado **"Also include default list of common package managers"** —
+   sem isso perde-se npm e `nodejs.org`, e o `npx @framer/agent` deixa de instalar.
+
+   Dois detalhes: a política vale a partir da **criação** do ambiente, então é
+   preciso **abrir uma sessão nova**; e alterar a allowlist **invalida o cache**,
+   fazendo o setup script rodar de novo — bom momento para instalar o Node 24+ nele.
+   Doc: https://code.claude.com/docs/en/claude-code-on-the-web
+
 2. **Rodar o `@framer/agent` na máquina local**, onde o Framer é acessível e a
    autenticação por navegador funciona normalmente:
    ```bash
    npx @framer/agent@latest setup
    npx @framer/agent@latest session new "<url do projeto>"
    ```
+   Nesse caso, use `FRAMER.md` como roteiro de build.
 
 **Antes de reconectar:** gerar uma **nova API key** do projeto no Framer
 (Site Settings → General). A key usada anteriormente foi compartilhada em chat e
@@ -102,6 +131,7 @@ assets/logo/          Monograma DC (placeholder)
 assets/img/           Placeholder da foto
 BRAND.md              Identidade, tom de voz, serviços, pendências
 README.md             Como rodar e como trocar os placeholders
+FRAMER.md             Spec de build no Framer (tokens, breakpoints, CMS, layers)
 ```
 
 Seções da página, na ordem: Header → Hero → Condições → Serviços → Abordagem
@@ -117,7 +147,7 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 - **Dados sensíveis:** o briefing de onboarding tinha faturamento, margem e
   comentários sobre concorrentes — isso foi **deliberadamente mantido fora do
   repositório**. Não versionar esse tipo de informação.
-- **Git:** desenvolver na branch `claude/nodejs-framer-agent-setup-wjpzga`.
+- **Git:** desenvolver na branch `claude/maria-eduarda-framer-migration-xdic3d`.
   Não abrir PR sem o usuário pedir.
 
 ## Próximos passos
@@ -126,4 +156,6 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
    imagem colada no chat): logo DC em SVG/PNG e foto da Dra. em JPG/PNG.
    Instruções de substituição no `README.md`.
 2. Coletar aprovação do conteúdo/textos com o cliente.
-3. Destravar o acesso ao Framer e reconstruir a landing nativamente no projeto.
+3. Destravar o acesso ao Framer (ver acima) e **executar o `FRAMER.md`** —
+   o spec já resolve `clamp()`/`color-mix()` em valores px por breakpoint, define
+   os Color/Text Styles, as 3 coleções de CMS e a árvore de layers de cada seção.
