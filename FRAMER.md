@@ -671,3 +671,111 @@ Estas não são detalhes de build — são coisas que faltam do lado da cliente:
    aproximada (ver `BRAND.md`).
 4. **Aprovação dos textos** pela cliente.
 5. **Imagem OG** para o preview no WhatsApp. As duas fotos novas servem de base.
+
+---
+
+## 11. Adições além do spec original (2026-07-25)
+
+O spec original cobria a migração 1:1 do blueprint. Depois de construída, a página
+ganhou quatro blocos novos, decididos com o Davi para melhorar identificação e
+conversão. **Estes não estão no `index.html`** — o blueprint HTML segue como
+referência da migração original, e o Framer passou a ser a fonte da verdade daqui
+em diante.
+
+### Estrutura atual da página
+
+```
+Header → Hero → Condições → Serviços → Como é a consulta → Abordagem
+  → Sobre → FAQ → Agendar (formulário) → CTA final → Footer  (+ WhatsApp flutuante)
+```
+
+### 11.1 Condições reescritas em 1ª pessoa
+
+A coleção `Condicoes` ganhou o campo **`Condicao`** (nome clínico). O card agora
+mostra o rótulo clínico como eyebrow e o **sintoma na voz do paciente** como
+título — "Meu nariz entope só de um lado" em vez de "Desvio de septo".
+Motivo: ninguém busca pelo diagnóstico, busca pelo sintoma.
+
+### 11.2 Seção "Como é a consulta"
+
+Coleção **`Consulta`** (4 passos: Indice, Titulo, Descricao), entre Serviços e
+Abordagem. Existe para derrubar o medo do desconhecido — a maior trava numa LP de
+otorrino não é preço, é não saber o que vai acontecer.
+
+### 11.3 FAQ em accordion
+
+Coleção **`FAQ`** (Pergunta, Resposta) + componente **`FAQ Item`** com as variantes
+`Aberta` / `Fechada`, alternadas por `SET_VARIANT` com `cycle`. As instâncias entram
+fechadas (`$control__variant="Fechada"`).
+
+> ⚠️ **O conteúdo do FAQ precisa do aval da Dra.** As seis respostas foram escritas
+> para não prometer resultado nem citar preço, e a de convênio **deliberadamente não
+> afirma nada** — manda falar no WhatsApp, porque essa informação não estava no
+> briefing. Não publicar sem ela revisar.
+
+### 11.4 Formulário que abre o WhatsApp preenchido
+
+Code component **`framer/AgendarForm.tsx`**, na seção `#agendar`.
+Três campos (nome, queixa, melhor horário) → monta a mensagem e abre o `wa.me`
+já escrito. O ganho não é o formulário: é a secretária receber *"Oi! Sou a Ana,
+minha queixa é nariz entupido, prefiro manhã"* em vez de *"oi"*.
+
+**Por que é code component:** o formulário nativo do Framer só redireciona para uma
+URL **fixa** — não dá para carregar o que a pessoa digitou. Só código monta a URL
+em runtime.
+
+**Onde o lead fica guardado:** por padrão, em lugar nenhum — a conversa no WhatsApp
+é o registro. O componente tem uma prop **`webhookUrl`** (Formspark, Zapier, n8n,
+Make…) que, se preenchida, manda o lead por POST em JSON antes de abrir o WhatsApp.
+Sem ela, um lead que desiste no meio some. **Vale plugar antes de publicar.**
+
+O CTA final virou o caminho alternativo ("Prefere falar direto?") para não competir
+com o formulário logo acima.
+
+### 11.5 Movimento
+
+| O quê | Como |
+|---|---|
+| Respiração | `loopEffect` no retrato do hero: `scale 1.02`, `mirror`, tween 4.5s (ciclo de 9s), `pauseOffscreen` |
+| Header ao rolar | Componente **`Header Fundo`** (`Topo` / `Scrolled`) posicionado atrás do conteúdo, trocando de variante via `scrollVariantEffect` |
+| Sublinhado do nav | Componente **`Nav Link`** com gesture variant de hover animando a largura do retângulo de 0% a 100% |
+
+Decisão de dose: **um** movimento de assinatura e micro-interações. O público inclui
+gente com apneia, vertigem e enxaqueca — movimento pesado aqui é contraindicado, não
+só brega. `metadata.reducedMotion` segue ligado.
+
+---
+
+## 12. Armadilhas novas do editor (achadas construindo a §11)
+
+Complementam a §9. Todas custaram tempo.
+
+1. **`loopEffect.rotate` tem default 360.** Pedi só `scale`, e o Framer preencheu o
+   resto — o retrato da Dra. ia **girar 360°** em loop. Regra: ao usar `loopEffect`,
+   **declare todas as transformações** (`x`, `y`, `rotate`, `rotateX`, `rotateY`,
+   `skewX`, `skewY`, `opacity`), mesmo as que ficam em zero, e releia o nó.
+   É a mesma classe de problema da §9.2.7, mas aqui o default é destrutivo.
+
+2. **`scrollVariantEffect.fromVariant` / `toVariant` não pegam.** Testei id e nome,
+   em comandos separados: aceita sem erro e não grava. O que funciona é o formato de
+   seções:
+   ```
+   SET <instância> scrollVariantEffect.trigger="onScrollTarget";
+   SET <instância> scrollVariantEffect.sections.0.target="<id da seção>";
+   SET <instância> scrollVariantEffect.sections.0.variant="<id da variante>";
+   ```
+
+3. **Os 4 pinos não funcionam como `inset`.** Com `position="absolute"` e
+   `left/right/top/bottom` em `0px`, o nó **não estica** — fica no tamanho
+   intrínseco. O tamanho vem de `width`/`height`; use `width="100%" height="100%"`.
+
+4. **Controles de instância usam `$control__<nome_em_snake_case>`, não o id
+   temporário.** Bindar `$control__faqVarQ` (meu id do `+Variable`) falhou **em
+   silêncio**; o certo era `$control__pergunta`. Sempre leia os controles com
+   `readComponentControls` antes de bindar.
+
+5. **`FixedOverlayNode` não é suportado dentro de `ComponentNode`.** Por isso o
+   header continua sendo `FrameNode` (para o menu lateral seguir funcionando) e só o
+   **fundo** virou componente, posicionado atrás do conteúdo. Se um dia o header
+   inteiro virar componente, o menu mobile precisa migrar para o padrão de drawer
+   com variante `Aberta`/`Fechada`.

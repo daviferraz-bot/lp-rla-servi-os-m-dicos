@@ -57,11 +57,18 @@ Página `/` (`augiA20Il`), reconstruída **nativamente** — sem embed nem ifram
   a razão está em `FRAMER.md` §9.2.5, é contraintuitivo
 - **16 Text Styles** (§3), 64 slots conferidos um a um — **sem `fontName` ainda**
 - **3 coleções de CMS** (§5) com os 13 itens
-- **9 seções** (§6): Header → Hero → Condições → Serviços → Abordagem → Sobre →
-  CTA final → Footer + botão flutuante do WhatsApp
-- **Componente `Button`** com 4 variantes (Primary, Ghost, Primary LG, Ghost Dark LG)
-- **`CopyrightLine`** instalado como code file, renderizando o ano corrente
-- **Reveal, SEO e `prefers-reduced-motion`** (§7 e §8)
+- **11 seções**: Header → Hero → Condições → Serviços → Como é a consulta →
+  Abordagem → Sobre → FAQ → Agendar → CTA final → Footer + WhatsApp flutuante
+- **6 coleções de CMS**: Condicoes, Servicos, Pilares, Consulta, FAQ
+- **Componentes**: `Button` (4 variantes), `FAQ Item` (accordion), `Nav Link`
+  (sublinhado no hover), `Header Fundo` (troca de estado ao rolar)
+- **Code files**: `CopyrightLine` (ano corrente) e `AgendarForm` (formulário que
+  abre o WhatsApp já preenchido)
+- **Reveal, SEO e `prefers-reduced-motion`** (§7 e §8), mais a respiração do hero
+
+> As seções novas (§11 do `FRAMER.md`) **não existem no `index.html`**. O blueprint
+> HTML continua sendo a referência da migração original; do §11 em diante o **Framer
+> é a fonte da verdade**.
 
 ### O que falta
 
@@ -69,10 +76,14 @@ Página `/` (`augiA20Il`), reconstruída **nativamente** — sem embed nem ifram
    Framer não tem upload de fonte (*"Custom fonts are not available to plugins"*) e
    nem Black Mango nem Garet existem na biblioteca dele. Hoje o site está em Inter.
    Depois do upload, aplicar `fontName` nos 16 presets — receita no fim do `FRAMER.md`.
-2. **Header “scrolled”** — não implementado; exige virar `ComponentNode` (§9.3.10).
-3. **Trocar os placeholders** de logo e foto. Ao trocar o logo, gerar **duas** cópias
-   tintadas (terracota e camel) — `currentColor` não funciona em SVG subido (§9.1.4).
-4. **Imagem OG** e aprovação dos textos.
+2. **Trocar o logo placeholder.** Gerar **duas** cópias tintadas (terracota e camel)
+   — `currentColor` não funciona em SVG subido (§9.1.4).
+3. **Revisar o conteúdo do FAQ com a Dra.** (§11.3) — principalmente a resposta
+   sobre convênio, que hoje só manda falar no WhatsApp porque a informação não
+   estava no briefing.
+4. **Plugar um `webhookUrl` no `AgendarForm`** se quiser guardar os leads. Sem ele,
+   quem desiste antes de abrir o WhatsApp se perde (§11.4).
+5. **Imagem OG** e aprovação dos textos.
 
 **Não publicar antes da troca dos placeholders** (decisão já tomada).
 
