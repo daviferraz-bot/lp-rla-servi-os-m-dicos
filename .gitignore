@@ -8,3 +8,9 @@ Thumbs.db
 # Logs / temporários
 *.log
 .cache/
+
+# Credenciais — nunca commitar (ex.: API key do Framer)
+.env
+.env.*
+*.key
+secrets.*

@@ -1,0 +1,129 @@
+# Contexto do projeto — LP Dra. Maria Eduarda Deon Ceccato
+
+> Este arquivo é carregado automaticamente pelo Claude Code.
+> Leia também `BRAND.md` (identidade + briefing) e `README.md` (como rodar).
+
+## O que é
+
+Landing page para a **Dra. Maria Eduarda Deon Ceccato** — Otorrinolaringologia,
+especializada em **Rinologia e Cirurgia de Base do Crânio**, em Porto Alegre e
+Grande POA. Cliente da Turbo Partners.
+
+Mensagem-âncora: **"Qualidade de vida começa por respirar bem."**
+
+## Objetivo final
+
+A landing foi construída em **HTML/CSS/JS puro como blueprint**, com a decisão já
+tomada (confirmada pelo cliente) de **reconstruí-la nativamente no Framer** —
+não como embed/iframe, mas como seções nativas, editáveis, com CMS e publicação.
+
+Por isso o código evita truques de CSS que o Framer não reproduz: tokens em
+variáveis CSS, layout em flex/grid simples, seções bem delimitadas.
+
+## Estado atual
+
+| Item | Status |
+|------|--------|
+| Landing HTML/CSS/JS | ✅ Construída, revisada visualmente e commitada |
+| Fontes da marca | ✅ Black Mango (9 pesos) + Garet (Book, Heavy) em `assets/fonts/` |
+| Paleta / identidade | ✅ Aplicada via tokens CSS (ver `:root` em `css/styles.css`) |
+| CTA WhatsApp | ✅ `https://wa.me/5551995337479` em todos os botões |
+| Preview hospedado | ✅ https://claude.ai/code/artifact/bf7cf9fd-d5ac-4690-89f2-096bb9f495a0 |
+| Logo DC oficial | ⚠️ **Pendente** — `assets/logo/dc-monogram.svg` é recriação aproximada |
+| Foto da Dra. | ⚠️ **Pendente** — `assets/img/portrait-placeholder.svg` é placeholder |
+| Migração para o Framer | ❌ **Bloqueada** — ver abaixo |
+
+## 🚧 Bloqueio da migração para o Framer
+
+**Projeto Framer de destino:**
+- URL: `https://framer.com/projects/Snow-State--XK7b062GvtBGT0A9gUKN-aarZy`
+- Project ID: `XK7b062GvtBGT0A9gUKN`
+
+**O que já foi feito:**
+- Node.js v24+ instalado (o ambiente vinha com v22) — ver seção abaixo.
+- `npx @framer/agent@latest setup` executado com sucesso (skills `framer` e
+  `framer-code-components` instaladas).
+- `project auth` concluído com sucesso (`Project XK7b062GvtBGT0A9gUKN saved`).
+
+**Onde travou:**
+`session new` falha com `Connection timeout after 90000ms`, porque a **política de
+rede do ambiente bloqueia todos os domínios do Framer**. O proxy retorna
+`403 CONNECT (policy denial)` para:
+
+```
+framer.com          api.framer.com
+edit.framer.com     framerusercontent.com
+```
+
+Isso **não deve ser contornado** (orientação explícita em `/root/.ccr/README.md`:
+negações de política se reportam, não se roteiam em volta).
+
+**Como destravar — escolha um:**
+
+1. **Liberar os 4 hosts acima** na política de rede do ambiente de execução remota
+   (https://code.claude.com/docs/en/claude-code-on-the-web). A política é definida
+   na criação do ambiente, então provavelmente é preciso **iniciar uma sessão nova**
+   para a mudança valer.
+2. **Rodar o `@framer/agent` na máquina local**, onde o Framer é acessível e a
+   autenticação por navegador funciona normalmente:
+   ```bash
+   npx @framer/agent@latest setup
+   npx @framer/agent@latest session new "<url do projeto>"
+   ```
+
+**Antes de reconectar:** gerar uma **nova API key** do projeto no Framer
+(Site Settings → General). A key usada anteriormente foi compartilhada em chat e
+deve ser revogada. **Nunca commitar a API key neste repositório.**
+
+## ⚠️ Node.js neste ambiente
+
+O ambiente vem com **Node v22**, mas o `@framer/agent` exige **v24+**.
+Foi instalado o binário oficial em `/opt/node-v26.5.0-linux-x64`. Para usá-lo:
+
+```bash
+export PATH="/opt/node-v26.5.0-linux-x64/bin:$PATH"
+```
+
+Como o contêiner é efêmero, **numa sessão nova essa instalação não existe mais** —
+verifique com `node --version` e reinstale se necessário (release oficial em
+https://nodejs.org/download/release/latest/).
+
+Os comandos do `@framer/agent` precisam de rede e acesso a `~/.agents`, então
+devem rodar **com permissões elevadas** (sem sandbox) — caso contrário travam.
+
+## Estrutura
+
+```
+index.html            Página única, seções ancoradas
+css/styles.css        Tokens (:root) + estilos + @font-face
+js/script.js          Menu mobile, header ao rolar, reveal on scroll
+assets/fonts/         Black Mango (títulos) · Garet (textos)
+assets/logo/          Monograma DC (placeholder)
+assets/img/           Placeholder da foto
+BRAND.md              Identidade, tom de voz, serviços, pendências
+README.md             Como rodar e como trocar os placeholders
+```
+
+Seções da página, na ordem: Header → Hero → Condições → Serviços → Abordagem
+(pilares) → Sobre → CTA final → Footer, mais botão flutuante de WhatsApp.
+
+## Convenções
+
+- **Idioma:** todo o conteúdo do site e a conversa com o cliente em **pt-BR**.
+- **Tom de voz:** informativo, acolhedor, levemente descontraído.
+  **Nunca** apelativo ou sensacionalista (exigência explícita do briefing).
+- **Cores e fontes:** usar sempre os tokens de `:root`; não introduzir cores fora
+  da paleta da marca.
+- **Dados sensíveis:** o briefing de onboarding tinha faturamento, margem e
+  comentários sobre concorrentes — isso foi **deliberadamente mantido fora do
+  repositório**. Não versionar esse tipo de informação.
+- **Git:** desenvolver na branch `claude/nodejs-framer-agent-setup-wjpzga`.
+  Não abrir PR sem o usuário pedir.
+
+## Próximos passos
+
+1. Trocar os placeholders quando o cliente enviar, **como arquivo** (anexo, não
+   imagem colada no chat): logo DC em SVG/PNG e foto da Dra. em JPG/PNG.
+   Instruções de substituição no `README.md`.
+2. Coletar aprovação do conteúdo/textos com o cliente.
+3. Destravar o acesso ao Framer e reconstruir a landing nativamente no projeto.

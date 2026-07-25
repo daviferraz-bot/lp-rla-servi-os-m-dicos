@@ -64,4 +64,9 @@ sobre creme. **Arquivos vetoriais (SVG/PNG) ainda pendentes** — só recebido c
 - [x] Número de WhatsApp para o CTA — +55 51 99533-7479
 - [ ] **Foto da Dra. em arquivo** (chegou só como imagem colada, não como arquivo) — para hero/seção "Sobre"
 - [ ] Valores oficiais de cor (hex/RGB), se houver no manual
-- [ ] Confirmar se a LP é uma página única ou terá múltiplas seções/âncoras
+- [x] Estrutura da LP — página única com seções ancoradas
+- [ ] Aprovação dos textos pelo cliente
+- [ ] Migração para o Framer (bloqueada por rede — ver `CLAUDE.md`)
+
+> ⚠️ Logo e foto precisam chegar **como arquivo/anexo**. Imagens coladas no chat
+> podem ser vistas, mas não geram arquivo para versionar e subir ao Framer.
