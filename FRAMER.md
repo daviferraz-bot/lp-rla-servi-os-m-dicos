@@ -639,7 +639,9 @@ Estado em **2026-07-25**, verificado no editor (não por leitura de código).
 - [x] Metadados e favicon preenchidos — title, description e favicon no RootNode
 - [ ] Imagem OG — **não existe** (ver Pendências)
 - [ ] Header muda de fundo ao rolar — **não implementado**, ver §9.3.10
-- [ ] Logo oficial e foto real da Dra. no lugar dos placeholders
+- [x] Fotos reais da Dra. no lugar do placeholder — retrato de jaleco no hero,
+      foto do 40º Congresso Panamericano na Sobre (2026-07-25)
+- [ ] Logo oficial no lugar do `dc-monogram.svg` (header e footer)
 - [ ] Textos aprovados pela cliente
 
 ### Como aplicar as fontes depois do upload
@@ -657,10 +659,15 @@ Conferir depois se o Framer não reescreveu nenhum `fontSize` de slot (§9.2.7).
 Estas não são detalhes de build — são coisas que faltam do lado da cliente:
 
 1. **Logo DC oficial** em SVG/PNG (fundo transparente, versões creme e terracota).
-   O arquivo atual é recriação aproximada.
-2. **Foto da Dra.** em JPG/PNG, **como arquivo** — imagem colada em chat não gera
-   arquivo versionável.
+   O arquivo atual é recriação aproximada. Ao subir no Framer, gerar **duas cópias
+   tintadas** — `currentColor` não resolve em SVG usado como imagem (§9.1.4).
+2. ~~**Foto da Dra.**~~ — ✅ resolvido em 2026-07-25. Duas fotos entraram:
+   `dra-maria-eduarda.jpg` (retrato de jaleco) no hero e
+   `dra-maria-eduarda-congresso.jpg` (40º Congresso Panamericano) na Sobre.
+   Ambas quadradas (1440² e 1080²) e cortadas para 4/5 pelo `aspectRatio` — o corte
+   é centralizado e tira 10% de cada lado. Se o cliente mandar versões já em 4/5,
+   trocar dá mais controle de enquadramento.
 3. **Valores oficiais de cor**, se houver manual de marca. A paleta atual é
    aproximada (ver `BRAND.md`).
 4. **Aprovação dos textos** pela cliente.
-5. **Imagem OG** para o preview no WhatsApp.
+5. **Imagem OG** para o preview no WhatsApp. As duas fotos novas servem de base.

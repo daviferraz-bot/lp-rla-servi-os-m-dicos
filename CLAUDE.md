@@ -31,7 +31,7 @@ variáveis CSS, layout em flex/grid simples, seções bem delimitadas.
 | Preview hospedado | ✅ https://claude.ai/code/artifact/bf7cf9fd-d5ac-4690-89f2-096bb9f495a0 |
 | Spec de migração | ✅ `FRAMER.md` — build completo, pronto para executar |
 | Logo DC oficial | ⚠️ **Pendente** — `assets/logo/dc-monogram.svg` é recriação aproximada |
-| Foto da Dra. | ⚠️ **Pendente** — `assets/img/portrait-placeholder.svg` é placeholder |
+| Fotos da Dra. | ✅ **Recebidas** (2026-07-25) — retrato de jaleco no hero, foto do congresso na Sobre |
 | Migração para o Framer | ✅ **Construída** (2026-07-25) — ver abaixo |
 | Fontes da marca no Framer | ⚠️ **Pendente** — upload é manual, o agente não consegue |
 
@@ -158,10 +158,11 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 1. **Subir as 6 fontes no Framer** (`Assets → Fonts → Upload`) e depois aplicar
    `fontName` nos 16 Text Styles. É o único item que trava a fidelidade visual —
    o site está em Inter hoje. Receita no fim do `FRAMER.md`.
-2. Trocar os placeholders quando o cliente enviar, **como arquivo** (anexo, não
-   imagem colada no chat): logo DC em SVG/PNG e foto da Dra. em JPG/PNG.
-   Instruções de substituição no `README.md`. Lembrar das **duas** cópias tintadas
-   do logo no Framer (`FRAMER.md` §9.1.4).
+2. **Trocar o logo** quando o cliente enviar, **como arquivo** (anexo, não imagem
+   colada no chat): logo DC em SVG/PNG. Instruções no `README.md`. Lembrar das
+   **duas** cópias tintadas no Framer — terracota e camel (`FRAMER.md` §9.1.4).
+   As fotos da Dra. já entraram: `assets/img/dra-maria-eduarda.jpg` (hero) e
+   `assets/img/dra-maria-eduarda-congresso.jpg` (Sobre).
 3. Coletar aprovação do conteúdo/textos com o cliente.
 4. Fechar os itens abertos do checklist (`FRAMER.md` §10): header "scrolled",
    ESC no menu mobile e imagem OG.
