@@ -32,97 +32,60 @@ variáveis CSS, layout em flex/grid simples, seções bem delimitadas.
 | Spec de migração | ✅ `FRAMER.md` — build completo, pronto para executar |
 | Logo DC oficial | ⚠️ **Pendente** — `assets/logo/dc-monogram.svg` é recriação aproximada |
 | Foto da Dra. | ⚠️ **Pendente** — `assets/img/portrait-placeholder.svg` é placeholder |
-| Migração para o Framer | ❌ **Bloqueada** — ver abaixo |
+| Migração para o Framer | ✅ **Construída** (2026-07-25) — ver abaixo |
+| Fontes da marca no Framer | ⚠️ **Pendente** — upload é manual, o agente não consegue |
 
-## 🚧 Bloqueio da migração para o Framer
+## ✅ Migração executada (2026-07-25)
 
-**Projeto Framer de destino:**
-- URL: `https://framer.com/projects/Snow-State--XK7b062GvtBGT0A9gUKN-aarZy`
-- Project ID: `XK7b062GvtBGT0A9gUKN`
+**O bloqueio de rede acabou.** O ambiente atual (Mac local do Davi) acessa o Framer
+normalmente — `framer.com` responde 307, não mais 403. Node v24.16.0 já instalado e
+o projeto já autenticado em `~/.config/framer/projects.json`. **Não peça API key**:
+ela já está salva para `XK7b062GvtBGT0A9gUKN`.
 
-**O que já foi feito:**
-- Node.js v24+ instalado (o ambiente vinha com v22) — ver seção abaixo.
-- `npx @framer/agent@latest setup` executado com sucesso (skills `framer` e
-  `framer-code-components` instaladas).
-- `project auth` concluído com sucesso (`Project XK7b062GvtBGT0A9gUKN saved`).
-
-**Onde travou:**
-`session new` falha com `Connection timeout after 90000ms`, porque a **política de
-rede do ambiente bloqueia todos os domínios do Framer**. O proxy retorna
-`403 CONNECT (policy denial)`.
-
-**Reteste em 2026-07-25, em contêiner novo — continua bloqueado:**
-
-```
-framer.com  ·  www.framer.com  ·  api.framer.com
-edit.framer.com  ·  framerusercontent.com  ·  framer.wiki   → todos 403
-github.com · nodejs.org                                     → OK (controle)
-```
-
-**Segundo reteste em 2026-07-25, após tentativa de desbloqueio — ainda 403.**
-Os quatro hosts principais seguem negados, e o `__agentproxy/status` confirma a
-causa: `"kind": "connect_rejected"`, `"gateway answered 403 to CONNECT (policy
-denial or upstream failure)"`.
-
-> Antes de gastar uma sessão nova nisso: rode o teste de 1 linha abaixo. Se der
-> 403, o desbloqueio não pegou e **não há build possível neste ambiente** — não
-> vale instalar Node nem pedir a API key.
->
+> O histórico do bloqueio (403 do security proxy, retestes, allowlist) foi removido
+> daqui por estar resolvido. Se voltar a dar 403 num contêiner novo, o teste é:
 > ```bash
 > curl -sS -o /dev/null -w "%{http_code}\n" --max-time 20 https://framer.com/
 > ```
->
-> Causa provável de o desbloqueio "não pegar": a política vale a partir da
-> **criação do ambiente**. Editar a allowlist e reabrir uma sessão no **mesmo
-> ambiente** não basta — é preciso um ambiente novo.
 
-Isso **não deve ser contornado** (orientação explícita em `/root/.ccr/README.md`:
-negações de política se reportam, não se roteiam em volta).
+### O que já está construído no projeto Framer
 
-### ⚠️ Não é problema de conexão com o GitHub
+Página `/` (`augiA20Il`), reconstruída **nativamente** — sem embed nem iframe:
 
-Confusão já levantada uma vez. São dois caminhos independentes:
+- **20 Color Styles** (§1) — paleta + as derivadas de `color-mix()`
+- **4 breakpoints** com quebras reais em **900 e 560** (§2) — precisou de 4, não 3;
+  a razão está em `FRAMER.md` §9.2.5, é contraintuitivo
+- **16 Text Styles** (§3), 64 slots conferidos um a um — **sem `fontName` ainda**
+- **3 coleções de CMS** (§5) com os 13 itens
+- **9 seções** (§6): Header → Hero → Condições → Serviços → Abordagem → Sobre →
+  CTA final → Footer + botão flutuante do WhatsApp
+- **Componente `Button`** com 4 variantes (Primary, Ghost, Primary LG, Ghost Dark LG)
+- **`CopyrightLine`** instalado como code file, renderizando o ano corrente
+- **Reveal, SEO e `prefers-reduced-motion`** (§7 e §8)
 
-- **GitHub** usa um *proxy dedicado*, independente do nível de acesso à rede — por
-  isso clone/push funcionam mesmo com política restritiva.
-- **Framer** passa pelo *security proxy*, governado pelo **Network access** do
-  ambiente. É esse que devolve 403.
+### O que falta
 
-O nível padrão é **Trusted**, cuja allowlist cobre npm, PyPI, GitHub e Docker Hub,
-mas **não o Framer**. Reconectar o GitHub não muda nada.
+1. **Subir as 6 fontes** — `Assets → Fonts → Upload`. **Só você consegue**: a API do
+   Framer não tem upload de fonte (*"Custom fonts are not available to plugins"*) e
+   nem Black Mango nem Garet existem na biblioteca dele. Hoje o site está em Inter.
+   Depois do upload, aplicar `fontName` nos 16 presets — receita no fim do `FRAMER.md`.
+2. **Header “scrolled”** — não implementado; exige virar `ComponentNode` (§9.3.10).
+3. **Trocar os placeholders** de logo e foto. Ao trocar o logo, gerar **duas** cópias
+   tintadas (terracota e camel) — `currentColor` não funciona em SVG subido (§9.1.4).
+4. **Imagem OG** e aprovação dos textos.
 
-**Como destravar — escolha um:**
+**Não publicar antes da troca dos placeholders** (decisão já tomada).
 
-1. **Editar o ambiente** (ícone de nuvem → engrenagem) → **Network access** →
-   **Custom**, adicionando:
-   ```
-   framer.com
-   *.framer.com
-   framerusercontent.com
-   *.framerusercontent.com
-   ```
-   Manter marcado **"Also include default list of common package managers"** —
-   sem isso perde-se npm e `nodejs.org`, e o `npx @framer/agent` deixa de instalar.
+### Leia antes de mexer no editor
 
-   Dois detalhes: a política vale a partir da **criação** do ambiente, então é
-   preciso **abrir uma sessão nova**; e alterar a allowlist **invalida o cache**,
-   fazendo o setup script rodar de novo — bom momento para instalar o Node 24+ nele.
-   Doc: https://code.claude.com/docs/en/claude-code-on-the-web
+`FRAMER.md` §9 foi reescrito **depois** do build e lista as armadilhas que só
+aparecem na tela. Duas que custam horas se você não souber:
 
-2. **Rodar o `@framer/agent` na máquina local**, onde o Framer é acessível e a
-   autenticação por navegador funciona normalmente:
-   ```bash
-   npx @framer/agent@latest setup
-   npx @framer/agent@latest session new "<url do projeto>"
-   ```
-   Nesse caso, use `FRAMER.md` como roteiro de build.
-
-**Antes de reconectar:** gerar uma **nova API key** do projeto no Framer
-(Site Settings → General). A key usada anteriormente foi compartilhada em chat e
-deve ser revogada. **Nunca commitar a API key neste repositório.**
-
-> Só peça a API key **depois** de o teste de acesso passar. Pedir antes queima uma
-> key à toa: o contêiner é efêmero e ela morre com a sessão sem ter sido usada.
+- **Um `SET` com um atributo inválido é descartado inteiro, em silêncio** — sem
+  `parseErrors`, sem `errors`, sem warning. Foi assim que dois botões saíram
+  idênticos. Ao mexer em `$control__*`, um atributo por `SET` e releia o nó.
+- **O Framer inventa valores nos slots de breakpoint que você não declara** — um
+  estilo de 11.8px fixo virou 9px sozinho. Declare tudo nos 4 slots e confira.
 
 ## ✅ Decisões de build já tomadas (2026-07-25)
 
@@ -135,21 +98,28 @@ reabrir com o cliente:
 | Ano do rodapé | **Code component** — pronto em `framer/CopyrightLine.tsx` |
 | Placeholders | **Construir com os placeholders** e trocar os assets depois. Não publicar antes da troca |
 
-## ⚠️ Node.js neste ambiente
+## ⚠️ Rodando o `@framer/agent`
 
-O ambiente vem com **Node v22**, mas o `@framer/agent` exige **v24+**.
-Foi instalado o binário oficial em `/opt/node-v26.5.0-linux-x64`. Para usá-lo:
+O `@framer/agent` exige **Node v24+**. No Mac do Davi já há **v24.16.0** — só
+conferir com `node --version`. (Num contêiner Linux o padrão é v22 e é preciso
+instalar o binário oficial de https://nodejs.org/download/release/latest/.)
+
+Os comandos precisam de rede e de acesso a `~/.agents`, então devem rodar **com
+permissões elevadas** (sem sandbox) — caso contrário travam.
+
+Fluxo de uma sessão:
 
 ```bash
-export PATH="/opt/node-v26.5.0-linux-x64/bin:$PATH"
+npx @framer/agent@latest session new "XK7b062GvtBGT0A9gUKN"   # imprime o session id
+npx @framer/agent@latest exec -s <id>                          # código via stdin
 ```
 
-Como o contêiner é efêmero, **numa sessão nova essa instalação não existe mais** —
-verifique com `node --version` e reinstale se necessário (release oficial em
-https://nodejs.org/download/release/latest/).
+Duas pegadinhas do runtime:
 
-Os comandos do `@framer/agent` precisam de rede e acesso a `~/.agents`, então
-devem rodar **com permissões elevadas** (sem sandbox) — caso contrário travam.
+- O `fs` do `exec` é **sandboxado** e não enxerga a pasta do projeto — copie o que
+  precisar para `/tmp` antes (foi assim que os SVGs subiram).
+- Ler um nó de volta depois de escrever é obrigatório: ver a seção
+  "Leia antes de mexer no editor" acima.
 
 ## Estrutura
 
@@ -185,14 +155,17 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 
 ## Próximos passos
 
-1. Trocar os placeholders quando o cliente enviar, **como arquivo** (anexo, não
+1. **Subir as 6 fontes no Framer** (`Assets → Fonts → Upload`) e depois aplicar
+   `fontName` nos 16 Text Styles. É o único item que trava a fidelidade visual —
+   o site está em Inter hoje. Receita no fim do `FRAMER.md`.
+2. Trocar os placeholders quando o cliente enviar, **como arquivo** (anexo, não
    imagem colada no chat): logo DC em SVG/PNG e foto da Dra. em JPG/PNG.
-   Instruções de substituição no `README.md`.
-2. Coletar aprovação do conteúdo/textos com o cliente.
-3. Destravar o acesso ao Framer (ver acima) e **executar o `FRAMER.md`** —
-   o spec já resolve `clamp()`/`color-mix()` em valores px por breakpoint, define
-   os Color/Text Styles, as 3 coleções de CMS e a árvore de layers de cada seção,
-   e as três decisões pendentes já estão fechadas.
+   Instruções de substituição no `README.md`. Lembrar das **duas** cópias tintadas
+   do logo no Framer (`FRAMER.md` §9.1.4).
+3. Coletar aprovação do conteúdo/textos com o cliente.
+4. Fechar os itens abertos do checklist (`FRAMER.md` §10): header "scrolled",
+   ESC no menu mobile e imagem OG.
+5. **Só então publicar.**
 
 **O caminho crítico é só o acesso ao Framer.** Os itens 1 e 2 não bloqueiam o
 build — a decisão foi construir com placeholders e trocar depois. Tudo o que dava

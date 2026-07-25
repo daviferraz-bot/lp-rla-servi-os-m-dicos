@@ -33,7 +33,16 @@ import { addPropertyControls, ControlType } from "framer"
  * @framerSupportedLayoutHeight auto
  * @framerIntrinsicWidth 320
  */
-export default function CopyrightLine(props) {
+interface CopyrightLineProps {
+    holder: string
+    notice: string
+    color: string
+    fontSize: number
+    align: "left" | "center" | "right"
+    style?: React.CSSProperties
+}
+
+export default function CopyrightLine(props: CopyrightLineProps) {
     const { holder, notice, color, fontSize, align, style } = props
 
     return (
@@ -61,7 +70,7 @@ CopyrightLine.defaultProps = {
     color: "rgba(245, 237, 228, 0.6)",
     fontSize: 13.1,
     align: "left",
-}
+} satisfies CopyrightLineProps
 
 addPropertyControls(CopyrightLine, {
     holder: {

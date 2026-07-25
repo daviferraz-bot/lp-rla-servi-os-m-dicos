@@ -496,37 +496,159 @@ Copiar de `index.html:6-11`:
 
 ## 9. O que não migra 1:1
 
-Coisas que exigem decisão humana no editor:
+> Seção reescrita em 2026-07-25 **depois de executar o build no editor**. O que
+> segue não é previsão: é o que apareceu na tela.
 
-1. **`backdrop-filter: blur(10px)`** no header — o Framer tem background blur, mas o
-   resultado pode diferir levemente. Comparar lado a lado.
-2. **`aspect-ratio: 4/5`** nas fotos — confirmar que o Framer mantém a proporção ao
-   redimensionar, em vez de fixar altura.
-3. **Gradiente radial do hero** — a sintaxe `120% 100% at 100% 0%` é específica.
-   Ajustar no olho até bater com o preview.
-4. **Escala fluida** — o CSS interpola continuamente entre breakpoints; o Framer dá
-   saltos. Entre 900 e 1200px o texto vai parecer um pouco diferente do blueprint.
-   É aceitável e esperado.
-5. ~~**Ano dinâmico no footer**~~ — ✅ resolvido: `framer/CopyrightLine.tsx`.
+### 9.1 Bloqueios reais da API
+
+1. **Fontes customizadas não podem ser subidas pelo agente.** Não existe método de
+   upload/registro de fonte, e a doc do plugin diz explicitamente *"Custom fonts are
+   not available to plugins"*. `font-search` por `Black Mango` e `Garet` retorna
+   vazio — não estão na biblioteca do Framer. **§0 é passo manual**: Assets → Fonts
+   → Upload, com os 6 arquivos de `assets/fonts/`.
+   Mitigação usada: os 16 Text Styles foram criados **sem `fontName`**. Como todo
+   layer aplica estilo por nome, aplicar a família depois é 1 comando por preset.
+
+2. **`$control__link` (LinkVariable) não pode ser setado numa instância pela DSL.**
+   Falharam as três formas: `$control__link.href`, `$control__link` e `link.href`
+   no próprio nó da instância. **Pior: um atributo inválido faz o `SET` inteiro ser
+   descartado em silêncio — sem `parseErrors`, sem `errors`, sem warning.** Foi o
+   que fez os dois botões do hero saírem idênticos.
+   Solução adotada: cada botão é uma `ComponentInstanceNode` dentro de um
+   `FrameNode` wrapper que carrega o `link.href`.
+   > Regra prática: ao mexer em `$control__*`, aplicar **um atributo por `SET`** e
+   > reler o nó. Diagnóstico limpo aqui **não** significa que aplicou.
+
+3. **Gradientes não aceitam tokens de cor.** O hero era
+   `radial-gradient(..., transparent 60%)` sobre `var(--sand)`. Foi achatado para um
+   gradiente que **termina em Sand** (`rgba(232,224,210,1) 60%`) — visualmente
+   idêntico, mas o Sand ali é literal e não acompanha o token se ele mudar.
+
+4. **`currentColor` não resolve em SVG subido como imagem.** O monograma usa
+   `stroke="currentColor"`. Foi preciso subir **uma cópia por tint** (terracota para
+   o header, camel para o footer). Ao trocar pelo logo oficial, gerar as duas.
+
+### 9.2 Breakpoints — a armadilha principal
+
+5. **A largura de um breakpoint NÃO é o ponto de quebra.** O Framer deriva o range
+   do breakpoint **seguinte**, e o menor sempre cobre `0 → próximo`. Criando
+   1200/900/560 os breaks reais ficaram em **1200 e 900** — o de 560 nunca era o
+   limite, só a largura da prancheta.
+   **Solução: 4 breakpoints.** Com 1200 / 900 / 560 / 390 os ranges saem:
+
+   | Breakpoint | Largura | Range real | Papel (CSS) |
+   |---|---|---|---|
+   | Desktop | 1200 | `≥1200` | desktop |
+   | Desktop S | 900 | `900–1199.98` | desktop (valores idênticos) |
+   | Tablet | 560 | `560–899.98` | `@media (max-width:900px)` |
+   | Phone | 390 | `≤559.98` | `@media (max-width:560px)` |
+
+   Os breaks caem exatamente em **900 e 560**, como decidido. O de 1200 é inócuo
+   porque Desktop e Desktop S carregam os mesmos valores.
+
+6. **`breakpoint.default.minWidth` dos Text Styles é travado em 1200** — aceita o
+   comando, ignora o valor. Os outros slots (`medium`, `small`) aceitam. Por isso os
+   presets usam 4 slots com `default == medium`, espelhando a tabela acima.
+
+7. **O Framer inventa valores nos slots que você não declara.** O `Eyebrow`, que é
+   11.8px fixo em todos os tamanhos, foi auto-escalado para **9px** no `medium`; 5
+   presets saíram com o `small` errado (`Body` virou 13px em vez de 16.8). Também
+   injeta `letterSpacing: -0.02em` por conta própria.
+   **Declare `fontSize`, `lineHeight` e `letterSpacing` explicitamente em todos os
+   4 slots, inclusive quando o valor não muda — e releia para conferir.**
+
+8. **`letterSpacing` não aceita `em`, só `px`/`rem`.** Todo o tracking em `em` do CSS
+   virou px calculado **por breakpoint**, para continuar escalando com o corpo.
+
+### 9.3 Fidelidade visual
+
+9. **`hoverEffect` não anima `borderColor`.** Afeta o botão ghost (borda
+   `Hairline Strong → Navy`) e o card (`border-color → transparent`). Nesses casos
+   só o fundo/sombra animam.
+   O Primary ficou 100% fiel por outro caminho: no CSS a borda dele tem **a mesma
+   cor do fundo**, então ela foi removida e os 1.5px foram somados ao padding —
+   caixa externa idêntica e `hoverEffect.backgroundColor` limpo.
+
+10. **Header “scrolled” não implementado.** Trocar `fill` no scroll exige
+    `scrollVariantEffect`, que só existe em `ComponentInstanceNode` — um `FrameNode`
+    solto não faz. Para fechar: transformar o header em `ComponentNode` com as
+    variantes `Topo` e `Scrolled` e ligar o `scrollVariantEffect`. Hoje o header é
+    sticky e translúcido, mas não muda ao rolar.
+
+11. **Sublinhado do nav crescendo da esquerda** não é expressável num
+    `LinkStylePreset`. Virou `text-decoration: underline` na cor Terracota no hover.
+    Para o efeito original seria preciso um componente com retângulo animado.
+
+12. **Menu mobile** virou `FixedOverlayNode` com `backdrop.dismissible` (painel de
+    320px / 78% vindo da direita, como no CSS). Fecha clicando fora. **Fechar com
+    ESC não foi verificado** e não há controle explícito para isso.
+
+13. **Escala fluida** — confirmado: o CSS interpola, o Framer dá saltos. Como não há
+    breakpoint em 1440, a coluna **XL da §3 não é usada**; acima de 1200 vale a
+    coluna D. A perda é pequena (H1 70.4 em vez de 72).
+
+14. ~~**Ano dinâmico no footer**~~ — ✅ resolvido: `framer/CopyrightLine.tsx`,
+    instalado como code file e renderizando `© 2026 …`. O arquivo precisou de
+    tipagem (`CopyrightLineProps` + `satisfies`) para passar no `typecheckCode`.
+
+15. **`backdrop-filter` e `aspect-ratio`** — ambos migraram bem
+    (`backgroundBlur="10px"` e `aspectRatio="0.8"`). Sem ressalva.
+
+### 9.4 Correções ao próprio spec
+
+16. **Tracking faltando na §3.** O CSS tem `h1, h2, h3 { letter-spacing: -0.01em }`,
+    e nada sobrescreve. Logo `H2 Sobre`, `H2 CTA`, `Card Title`, `Card Title LG` e
+    `Pillar Title` **também levam -0.01em** — a tabela da §3 omitia. Já aplicado.
+    (`Card Index` é `<span>`, não herda: fica sem tracking, como o spec dizia.)
+
+17. **Peso dos headings: a §3 está certa (300).** Registrando porque é uma pegadinha:
+    a regra base `h1, h2, h3` diz `font-weight: 400`, mas todas as regras específicas
+    (`.hero-copy h1`, `.section-head h2`, `.sobre-copy h2`, `.cta h2`) dizem **300** e
+    vencem por especificidade. Não “corrigir” para 400.
+
+18. **Contraste do `Card Index`.** Camel sobre Cream dá **2.0** contra 2.2 exigido —
+    o linter do Framer acusa. Vem do blueprint, não da migração. Num site médico vale
+    levar ao cliente: escurecer o Camel só nesse numeral resolveria.
+
+19. **Slug do CMS sai com acento** (`alterações-do-olfato`, `confiança`). Inócuo hoje
+    porque não há detail page. Em `Servicos` o `Titulo` foi criado antes do `Indice`
+    (e o `Indice` movido para a posição 0) justamente para o slug sair `consultas` e
+    não `01`.
 
 ## 10. Checklist de aceite
 
-- [ ] 6 fontes subidas, nenhuma extra
-- [ ] Color styles criados e **aplicados por nome** (nada de hex solto nos layers)
-- [ ] Breakpoints em 900 e 560
-- [ ] 3 coleções de CMS populadas (6 + 3 + 4 itens)
-- [ ] As 3 grids de card reagem corretamente em 3 → 2 → 1 coluna
-- [ ] Pilares: 4 → 2 → 1
-- [ ] Todos os CTAs apontam para `https://wa.me/5551995337479`
-- [ ] Instagram aponta para `https://instagram.com/dudaceccato.otorrino`
-- [ ] Âncoras funcionam: `#condicoes`, `#servicos`, `#sobre`, `#contato`
-- [ ] Menu mobile abre, fecha ao clicar em link e fecha com ESC
-- [ ] Rodapé usa o code component `CopyrightLine` (nenhum ano digitado à mão)
-- [ ] Reveal dispara uma vez só, não a cada scroll
-- [ ] `prefers-reduced-motion` respeitado
-- [ ] Metadados e favicon preenchidos
+Estado em **2026-07-25**, verificado no editor (não por leitura de código).
+
+- [ ] 6 fontes subidas, nenhuma extra — **bloqueado, passo manual** (ver §9.1.1).
+      Hoje o site renderiza em Inter.
+- [x] Color styles criados e **aplicados por nome** — 20 tokens; varredura na árvore
+      não achou nenhum hex/rgb solto em `fill`/`textColor`/`borderColor`
+- [x] Breakpoints em 900 e 560 — via 4 breakpoints, ver §9.2.5
+- [x] 3 coleções de CMS populadas (6 + 3 + 4 itens) — com acentos e travessões
+- [x] As 3 grids de card reagem em 3 → 2 → 1 coluna
+- [x] Pilares: 4 → 2 → 1
+- [x] Todos os CTAs apontam para `https://wa.me/5551995337479` — 7 ocorrências,
+      nenhum wa.me divergente
+- [x] Instagram aponta para `https://instagram.com/dudaceccato.otorrino` — 2
+- [x] Âncoras funcionam: `#inicio`, `#condicoes`, `#servicos`, `#sobre`, `#contato`
+- [~] Menu mobile abre e fecha clicando fora (overlay dismissible). **ESC não
+      verificado**; fechar ao clicar num link não foi configurado — ver §9.3.12
+- [x] Rodapé usa o code component `CopyrightLine` — renderiza `© 2026 …`
+- [x] Reveal dispara uma vez só (`appearEffect.replay="false"`, 0.7s, bezier do site)
+- [x] `prefers-reduced-motion` respeitado — `metadata.reducedMotion="true"` no RootNode
+- [x] Metadados e favicon preenchidos — title, description e favicon no RootNode
+- [ ] Imagem OG — **não existe** (ver Pendências)
+- [ ] Header muda de fundo ao rolar — **não implementado**, ver §9.3.10
 - [ ] Logo oficial e foto real da Dra. no lugar dos placeholders
 - [ ] Textos aprovados pela cliente
+
+### Como aplicar as fontes depois do upload
+
+Com as 6 faces subidas no editor, rodar `session new` (para o `<custom-fonts>`
+atualizar) e aplicar a família nos 16 presets — `Black Mango` em `H1 Hero`,
+`H2 Section`, `H2 Sobre`, `H2 CTA`, `Card Title`, `Card Title LG`, `Card Index` e
+`Pillar Title`; `Garet` nos outros 8. Os pesos já estão corretos em cada preset.
+Conferir depois se o Framer não reescreveu nenhum `fontSize` de slot (§9.2.7).
 
 ---
 
