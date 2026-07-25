@@ -29,11 +29,11 @@ estética elegante, autêntica e profissional.
 | Azul marinho   | `#2C3D5B` | Texto principal, títulos escuros      |
 
 ## Tipografia
-- **Títulos:** Black Mango (pesos: ExtraLight, Light, Bold, ExtraBold, Black) — `assets/fonts/`
-- **Textos:** Garet  ⚠️ *arquivo ainda não recebido*
+- **Títulos:** Black Mango (Thin, ExtraLight, Light, Regular, Medium, SemiBold, Bold, ExtraBold, Black) — `assets/fonts/`
+- **Textos:** Garet (Book) — `assets/fonts/Garet-Book.ttf`
 
 ## Pendências
-- [ ] Arquivo(s) da fonte **Garet**
+- [x] Arquivo(s) da fonte **Garet** — recebido (Garet-Book)
 - [ ] Logo / monograma DC em SVG ou PNG
 - [ ] Valores oficiais de cor (hex/RGB) se houver
 - [ ] Conteúdo: serviços, CTA principal (WhatsApp? formulário?), contato, endereço
