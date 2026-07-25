@@ -173,6 +173,9 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 1. **Subir as 6 fontes no Framer** (`Assets → Fonts → Upload`) e depois aplicar
    `fontName` nos 16 Text Styles. É o único item que trava a fidelidade visual —
    o site está em Inter hoje. Receita no fim do `FRAMER.md`.
+   ⚠️ **O H1 do hero não segue mais o Text Style** (foi destacado para aceitar a
+   fonte manuscrita) e seus trechos em sans estão com `Inter` fixo nos 4
+   breakpoints. Trocar na mão para Black Mango — `FRAMER.md` §14.3.
 2. **Trocar o logo** quando o cliente enviar, **como arquivo** (anexo, não imagem
    colada no chat): logo DC em SVG/PNG. Instruções no `README.md`. Lembrar das
    **duas** cópias tintadas no Framer — terracota e camel (`FRAMER.md` §9.1.4).

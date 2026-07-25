@@ -842,3 +842,81 @@ pai** — cada card animava sozinho e a cascata não acontecia. Foi preciso
 Dose: tudo entra uma vez só (`replay="false"`) e `metadata.reducedMotion` segue
 ligado. O público inclui gente com apneia, vertigem e enxaqueca — nada de parallax
 ou scroll-jacking.
+
+---
+
+## 14. Credenciais, funil e a frase manuscrita (2026-07-25)
+
+### 14.1 Formação e registro profissional
+
+A Sobre ganhou uma faixa de credenciais (borda superior + 4 colunas), vinda da bio
+do Instagram dela:
+
+| Rótulo | Valor |
+|---|---|
+| Medicina | PUCRS |
+| Otorrinolaringologia | HCPA |
+| Rinologia e Cirurgia de Base do Crânio | EPM / UNIFESP |
+| Registro | CRM-RS 49262 · RQE 46420 |
+
+**O CRM e o RQE não são enfeite.** A norma de publicidade médica exige a
+identificação do registro, e o **RQE** especificamente quando se anuncia uma
+especialidade — que é exatamente o que a página faz ("especializada em Rinologia e
+Cirurgia de Base do Crânio"). Aparecem em **dois lugares**: na faixa da Sobre e no
+rodapé.
+
+> Os rótulos espelham a bio dela ao pé da letra. **Não** foram inventados os termos
+> "residência" ou "fellowship" — se ela quiser essa precisão, é ela quem confirma.
+
+### 14.2 Funil: tudo converge para o formulário
+
+Decisão do Davi: **os CTAs levam à seção `#agendar`**, não ao WhatsApp direto.
+O WhatsApp direto ficou só em dois pontos, e o botão flutuante foi **removido**.
+
+| Onde | Destino |
+|---|---|
+| Header (desktop e menu mobile) | `/#agendar` |
+| Hero — "Agendar consulta" | `/#agendar` |
+| Sobre — "Marcar uma consulta" | `/#agendar` |
+| CTA final — "Prefere falar direto?" | `wa.me` |
+| Rodapé | `wa.me` |
+| ~~Botão flutuante~~ | removido |
+
+Motivo: sem passar pelo formulário, o lead que desiste no meio some. Com o funil
+assim, o `webhookUrl` do `AgendarForm` (§11.4) deixa de ser opcional na prática —
+**é ele que segura o lead.**
+
+O rótulo do botão do hero mudou de "Agendar pelo WhatsApp" para "Agendar consulta",
+porque ele não leva mais ao WhatsApp.
+
+### 14.3 "respirar bem" manuscrito — e a dívida que isso criou
+
+A frase-âncora usa **Caveat** (Google Fonts, peso 600), manuscrita natural — as
+opções caligráficas formais (Great Vibes, Alex Brush) foram descartadas por lerem
+como convite de casamento, não como consultório.
+
+O efeito de "sendo escrita" é o `textEffect` do próprio H1 com
+`tokenization="character"` e `delay="0.022s"`: as letras entram uma a uma, da
+esquerda para a direita.
+
+> **Por que não um traço de caneta de verdade:** o desenho real da linha exige o
+> texto como path SVG com `stroke-dashoffset` animado. Isso tiraria "respirar bem"
+> do `<h1>` — a frase-âncora da marca sumiria do principal sinal de SEO da página, e
+> leitor de tela perderia o texto. O ganho visual não paga.
+
+**⚠️ Dívida técnica.** `fontName` **não pode ser setado num `TextRun` enquanto o
+`RichTextNode` tiver `textStylePreset`** — o preset governa a família e o comando é
+descartado em silêncio (testado também com Inter, para confirmar que não era a
+Caveat). A saída foi `textStylePreset="null"` no H1 do hero, o que **inlina** os
+estilos do preset. Consequências:
+
+1. O H1 do hero **não segue mais o Text Style `H1 Hero`**.
+2. Os tamanhos por breakpoint tiveram que ser repostos na mão
+   (70.4 / 70.4 / 56.4 / 41.2 e o tracking correspondente).
+3. Os runs em sans ficaram com **`fontName="Inter"` fixo**. Quando a Black Mango for
+   subida, **esses runs não vão mudar sozinhos** — trocar na mão, nos 4 breakpoints.
+4. Setar `fontSize` num run empurra os estilos para **todos** os runs
+   individualmente e limpa o valor do nó. Não é bug, mas surpreende ao reler.
+
+Tamanhos da Caveat (ela tem altura-x baixa e no mesmo px parece bem menor que a
+sans): **90 / 90 / 72 / 53** px, contra 70.4 / 70.4 / 56.4 / 41.2 da sans.
