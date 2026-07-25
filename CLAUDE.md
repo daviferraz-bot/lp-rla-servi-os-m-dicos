@@ -59,6 +59,23 @@ edit.framer.com  ·  framerusercontent.com  ·  framer.wiki   → todos 403
 github.com · nodejs.org                                     → OK (controle)
 ```
 
+**Segundo reteste em 2026-07-25, após tentativa de desbloqueio — ainda 403.**
+Os quatro hosts principais seguem negados, e o `__agentproxy/status` confirma a
+causa: `"kind": "connect_rejected"`, `"gateway answered 403 to CONNECT (policy
+denial or upstream failure)"`.
+
+> Antes de gastar uma sessão nova nisso: rode o teste de 1 linha abaixo. Se der
+> 403, o desbloqueio não pegou e **não há build possível neste ambiente** — não
+> vale instalar Node nem pedir a API key.
+>
+> ```bash
+> curl -sS -o /dev/null -w "%{http_code}\n" --max-time 20 https://framer.com/
+> ```
+>
+> Causa provável de o desbloqueio "não pegar": a política vale a partir da
+> **criação do ambiente**. Editar a allowlist e reabrir uma sessão no **mesmo
+> ambiente** não basta — é preciso um ambiente novo.
+
 Isso **não deve ser contornado** (orientação explícita em `/root/.ccr/README.md`:
 negações de política se reportam, não se roteiam em volta).
 
@@ -104,6 +121,20 @@ mas **não o Framer**. Reconectar o GitHub não muda nada.
 (Site Settings → General). A key usada anteriormente foi compartilhada em chat e
 deve ser revogada. **Nunca commitar a API key neste repositório.**
 
+> Só peça a API key **depois** de o teste de acesso passar. Pedir antes queima uma
+> key à toa: o contêiner é efêmero e ela morre com a sessão sem ter sido usada.
+
+## ✅ Decisões de build já tomadas (2026-07-25)
+
+Os três pontos do `FRAMER.md` que exigiam decisão humana estão resolvidos. Não
+reabrir com o cliente:
+
+| Ponto | Decisão |
+|---|---|
+| Breakpoints | Ajustar o Framer para **900 / 560** (bate com o CSS). Fazer **antes** de montar layers |
+| Ano do rodapé | **Code component** — pronto em `framer/CopyrightLine.tsx` |
+| Placeholders | **Construir com os placeholders** e trocar os assets depois. Não publicar antes da troca |
+
 ## ⚠️ Node.js neste ambiente
 
 O ambiente vem com **Node v22**, mas o `@framer/agent` exige **v24+**.
@@ -132,6 +163,7 @@ assets/img/           Placeholder da foto
 BRAND.md              Identidade, tom de voz, serviços, pendências
 README.md             Como rodar e como trocar os placeholders
 FRAMER.md             Spec de build no Framer (tokens, breakpoints, CMS, layers)
+framer/               Code components para colar no editor do Framer
 ```
 
 Seções da página, na ordem: Header → Hero → Condições → Serviços → Abordagem
@@ -147,7 +179,8 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 - **Dados sensíveis:** o briefing de onboarding tinha faturamento, margem e
   comentários sobre concorrentes — isso foi **deliberadamente mantido fora do
   repositório**. Não versionar esse tipo de informação.
-- **Git:** desenvolver na branch `claude/maria-eduarda-framer-migration-xdic3d`.
+- **Git:** desenvolver na branch `claude/maria-eduarda-framer-migration-0tkx69`
+  (sucessora de `-xdic3d`, que foi incorporada por fast-forward).
   Não abrir PR sem o usuário pedir.
 
 ## Próximos passos
@@ -158,4 +191,9 @@ Seções da página, na ordem: Header → Hero → Condições → Serviços →
 2. Coletar aprovação do conteúdo/textos com o cliente.
 3. Destravar o acesso ao Framer (ver acima) e **executar o `FRAMER.md`** —
    o spec já resolve `clamp()`/`color-mix()` em valores px por breakpoint, define
-   os Color/Text Styles, as 3 coleções de CMS e a árvore de layers de cada seção.
+   os Color/Text Styles, as 3 coleções de CMS e a árvore de layers de cada seção,
+   e as três decisões pendentes já estão fechadas.
+
+**O caminho crítico é só o acesso ao Framer.** Os itens 1 e 2 não bloqueiam o
+build — a decisão foi construir com placeholders e trocar depois. Tudo o que dava
+para preparar fora do editor já está preparado.

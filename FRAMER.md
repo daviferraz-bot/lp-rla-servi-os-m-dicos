@@ -9,6 +9,18 @@
 > Fonte da verdade do conteúdo: `index.html`. Fonte da verdade visual: `css/styles.css`.
 > Identidade e tom de voz: `BRAND.md`.
 
+## Decisões já tomadas (2026-07-25)
+
+Três pontos deste spec exigiam decisão humana. Foram decididos com o Davi e
+**não precisam ser rediscutidos** — estão marcados como ✅ nas seções
+correspondentes.
+
+| Ponto | Decisão | Seção |
+|---|---|---|
+| Breakpoints | **Ajustar o Framer para 900 / 560**, para bater com o CSS | §2 |
+| Ano do rodapé | **Code component**, já escrito em `framer/CopyrightLine.tsx` | §6.8 |
+| Placeholders | **Subir os placeholders e construir**, trocar os assets depois | §0 |
+
 ## Por que este documento existe
 
 O CSS usa `clamp()`, `color-mix()`, `vw` e unidades `ch` — coisas que o Framer não
@@ -25,8 +37,9 @@ nos quatro breakpoints, prontos para digitar no painel do Framer.
 
 1. **Nova API key** do projeto (Site Settings → General). A key anterior foi
    compartilhada em chat e deve ser revogada. **Nunca commitar a key aqui.**
-2. **Assets pendentes** — hoje são placeholders. Se ainda não chegaram, suba os
-   placeholders e troque depois:
+2. **Assets pendentes** — ✅ **Decidido: subir os placeholders e construir agora.**
+   O layout não precisa ser refeito quando os arquivos reais chegarem — basta
+   substituir o asset no Framer. **Não publicar o site antes da troca.**
    - `assets/logo/dc-monogram.svg` — recriação aproximada, **não é o logo oficial**
    - `assets/img/portrait-placeholder.svg` — placeholder da foto da Dra.
 3. **Fontes** (Assets → Fonts → Upload). O CSS declara 6 faces, mas o repo tem 11
@@ -99,12 +112,14 @@ componentes:
 ## 2. Breakpoints
 
 O CSS quebra em **900px** e **560px**. Os padrões do Framer (Tablet 810, Phone 390)
-**não coincidem**. Ajuste as larguras dos breakpoints no Framer para 900 e 560, para
-que o resultado bata com o blueprint.
+**não coincidem**.
 
-Se preferir manter os padrões do Framer, o layout ainda funciona — mas os cards vão
-passar de 3 para 2 colunas num ponto diferente do previsto. **Recomendação: ajustar
-para 900/560.**
+✅ **Decidido: ajustar os breakpoints do Framer para 900 e 560.** Primeira coisa a
+fazer no editor, antes de montar qualquer layer — mudar breakpoint depois de
+construir obriga a revisar todos os overrides de tamanho.
+
+As colunas `T` e `P` das tabelas abaixo continuam medidas em 810 e 390 (larguras de
+referência para conferir o resultado), mas os **pontos de quebra** são 900 e 560.
 
 Os valores das tabelas seguintes usam quatro larguras de referência:
 
@@ -404,9 +419,17 @@ Footer  [bg Navy, texto Cream 85, padding-top ver tabela,
    └─ "© {ano} Dra. Maria Eduarda Deon Ceccato. Todos os direitos reservados."
 ```
 
-⚠️ **O ano é dinâmico** (`js/script.js` preenche via `new Date().getFullYear()`).
-No Framer, ou use um code component de uma linha, ou digite o ano fixo e trate como
-manutenção anual. **Não deixe o texto `{ano}` literal na página.**
+✅ **O ano é dinâmico** e a decisão é **usar code component** — já escrito em
+`framer/CopyrightLine.tsx` neste repositório, com instruções de instalação no
+cabeçalho do arquivo. Ele renderiza a linha de copyright **inteira** (não só o ano),
+porque code components no Framer são layers próprios e não podem ser inseridos
+dentro de um text layer como um `<span>`.
+
+Consequência: a tipografia do rodapé está duplicada dentro do componente (Text
+Styles não cascateiam para code components). Se o Text Style do rodapé mudar,
+atualizar o `.tsx` também.
+
+**Não deixe o texto `{ano}` literal na página.**
 
 Hover dos links de contato: cor → Cream + sublinhado.
 
@@ -484,7 +507,7 @@ Coisas que exigem decisão humana no editor:
 4. **Escala fluida** — o CSS interpola continuamente entre breakpoints; o Framer dá
    saltos. Entre 900 e 1200px o texto vai parecer um pouco diferente do blueprint.
    É aceitável e esperado.
-5. **Ano dinâmico no footer** — ver 6.8.
+5. ~~**Ano dinâmico no footer**~~ — ✅ resolvido: `framer/CopyrightLine.tsx`.
 
 ## 10. Checklist de aceite
 
@@ -498,6 +521,7 @@ Coisas que exigem decisão humana no editor:
 - [ ] Instagram aponta para `https://instagram.com/dudaceccato.otorrino`
 - [ ] Âncoras funcionam: `#condicoes`, `#servicos`, `#sobre`, `#contato`
 - [ ] Menu mobile abre, fecha ao clicar em link e fecha com ESC
+- [ ] Rodapé usa o code component `CopyrightLine` (nenhum ano digitado à mão)
 - [ ] Reveal dispara uma vez só, não a cada scroll
 - [ ] `prefers-reduced-motion` respeitado
 - [ ] Metadados e favicon preenchidos
