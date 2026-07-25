@@ -83,7 +83,11 @@ Página `/` (`augiA20Il`), reconstruída **nativamente** — sem embed nem ifram
    estava no briefing.
 4. **Plugar um `webhookUrl` no `AgendarForm`** se quiser guardar os leads. Sem ele,
    quem desiste antes de abrir o WhatsApp se perde (§11.4).
-5. **Imagem OG** e aprovação dos textos.
+5. **Trocar as imagens dos cards de Serviços.** Hoje são placeholders do Unsplash,
+   escolhidas **sem pessoas** de propósito — stock com profissionais posando lê como
+   se fossem a Dra. e a equipe dela (`FRAMER.md` §13.3). O ideal são fotos do
+   consultório dela.
+6. **Imagem OG** e aprovação dos textos.
 
 **Não publicar antes da troca dos placeholders** (decisão já tomada).
 

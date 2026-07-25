@@ -779,3 +779,66 @@ Complementam a §9. Todas custaram tempo.
    **fundo** virou componente, posicionado atrás do conteúdo. Se um dia o header
    inteiro virar componente, o menu mobile precisa migrar para o padrão de drawer
    com variante `Aberta`/`Fechada`.
+
+---
+
+## 13. Imagens, ícones e motion (2026-07-25)
+
+### 13.1 Serviços em coluna única no Tablet
+
+`Servicos` tem 3 itens: em 2 colunas sobrava um card órfão na segunda linha. No
+Tablet (560–899) o grid vira **stack vertical**. `Condicoes` (6 itens) e `Consulta`
+(4) continuam em 2 colunas, porque fecham as linhas.
+
+### 13.2 Ícones vindos do CMS
+
+`Condicoes`, `Consulta` e `Pilares` ganharam um campo **`Icone`** (`+IconVariable`,
+set **Lucide**). O `IconNode` do template é bindado com
+`$control__icon="var(--variable-<id>)"`, então a Dra. troca o ícone pelo CMS sem
+tocar no layout.
+
+| Coleção | Ícones | Cor |
+|---|---|---|
+| Condicoes | Droplets · Scan Face · Wind · Audio Lines · Moon · Flower 2 | Terracota |
+| Consulta | Calendar Check · Stethoscope · Clipboard List · Repeat | Camel |
+| Pilares | Hand Heart · Heart Handshake · Users · Microscope | Cream |
+
+Nos Serviços o ícone teria competido com o numeral grande, então esse card recebeu
+**imagem** em vez de ícone.
+
+### 13.3 Imagens nos cards de Serviços
+
+`Servicos` ganhou o campo **`Imagem`** (`+Variable type="image"`). O card foi
+reestruturado para a imagem sangrar até a borda:
+
+```
+Card  [padding 0, overflow clip]
+├─ Imagem   [width 100%, aspectRatio 1.6, fill = var(--variable-<id>)]
+└─ Conteúdo [padding 28.8/32/35.2/32]  ← numeral, título e descrição
+```
+
+Tratamento aplicado no template: `saturate="88%"` e `brightness="102%"`, para o
+stock frio não brigar com a paleta creme/terracota. Hover: `scale 1.05` na imagem.
+
+> ⚠️ **As imagens são placeholders do Unsplash.** A primeira tentativa trouxe fotos
+> de **outras pessoas** em centro cirúrgico — numa página da própria médica, isso lê
+> como se fossem ela e a equipe dela. Foram trocadas por imagens **sem pessoas**
+> (ambiente, instrumentos). Mantenha essa regra ao substituir: ou foto real do
+> consultório dela, ou imagem sem gente. Nunca stock com profissionais posando.
+
+### 13.4 Motion
+
+| Onde | O quê |
+|---|---|
+| Grids (5) | `appearEffect` no **container** com `stagger 0.08s` — os cards entram em cascata |
+| Títulos (9 H2/H1) | `textEffect` com `tokenization="word"`, y 12px, 0.55s — entram palavra a palavra |
+| Imagens de Serviço | `hoverEffect.scale 1.05` |
+| Hero | respiração (§11.5) |
+
+**Pegadinha:** os cards tinham `appearEffect` próprio, que **anula o stagger do
+pai** — cada card animava sozinho e a cascata não acontecia. Foi preciso
+`appearEffect="null"` nos templates de card para o stagger do grid valer.
+
+Dose: tudo entra uma vez só (`replay="false"`) e `metadata.reducedMotion` segue
+ligado. O público inclui gente com apneia, vertigem e enxaqueca — nada de parallax
+ou scroll-jacking.
