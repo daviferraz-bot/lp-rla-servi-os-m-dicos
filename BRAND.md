@@ -34,9 +34,10 @@ Rinite · Sinusites · Desvio de septo · Ronco · Apneia do sono · Alteraçõe
 
 ## Conversão / Contato
 - **Canal principal:** Atendimento por **WhatsApp** + consultório (loja física).
+- **WhatsApp:** +55 51 99533-7479 → link `https://wa.me/5551995337479`
 - **Instagram:** [@dudaceccato.otorrino](https://instagram.com/dudaceccato.otorrino)
 - Site: ainda não possui (esta LP será o primeiro).
-- **CTA principal sugerido:** botão de WhatsApp ("Agendar consulta"). *(a confirmar nº)*
+- **CTA principal:** botão de WhatsApp ("Agendar consulta") apontando para o link acima.
 
 ## Símbolo / Logo
 Monograma **DC** — formas orgânicas e curvas suaves que remetem ao fluxo da respiração,
@@ -60,7 +61,7 @@ sobre creme. **Arquivos vetoriais (SVG/PNG) ainda pendentes** — só recebido c
 
 ## Pendências
 - [ ] **Logo/monograma DC em SVG ou PNG** (fundo transparente, versões creme e terracota)
-- [ ] Número de WhatsApp para o CTA
+- [x] Número de WhatsApp para o CTA — +55 51 99533-7479
+- [ ] **Foto da Dra. em arquivo** (chegou só como imagem colada, não como arquivo) — para hero/seção "Sobre"
 - [ ] Valores oficiais de cor (hex/RGB), se houver no manual
-- [ ] Fotos da Dra. / do consultório (se houver) para o hero e seção "sobre"
 - [ ] Confirmar se a LP é uma página única ou terá múltiplas seções/âncoras
