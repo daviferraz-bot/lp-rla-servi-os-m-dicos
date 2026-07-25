@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Monograma DC">
+  <!-- Recriação aproximada do monograma DC (placeholder). Substituir pelo arquivo oficial. -->
+  <g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- D: haste -->
+    <path d="M80 58 L80 170"/>
+    <!-- D: bojo -->
+    <path d="M80 58 C 132 58, 156 88, 156 114 C 156 148, 124 170, 80 170"/>
+    <!-- C: aberto para a direita, sobreposto ao D -->
+    <path d="M182 80 C 156 56, 110 58, 96 98 C 82 138, 108 178, 152 172 C 168 170, 178 162, 184 152"/>
+    <!-- Swash inferior (fluxo/respiração) -->
+    <path d="M66 184 C 108 170, 152 180, 190 156" stroke-width="3"/>
+  </g>
+</svg>

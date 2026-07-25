@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" role="img" aria-label="Espaço reservado para a foto da Dra. Maria Eduarda">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C4A47C"/>
+      <stop offset="1" stop-color="#8A8B77"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="800" fill="url(#bg)"/>
+  <g fill="#F5EDE4" opacity="0.92">
+    <!-- silhueta simples -->
+    <circle cx="320" cy="300" r="120"/>
+    <path d="M120 800 C 120 590, 210 470, 320 470 C 430 470, 520 590, 520 800 Z"/>
+  </g>
+  <text x="320" y="740" text-anchor="middle" fill="#2C3D5B" font-family="Georgia, serif" font-size="26" opacity="0.8">Foto da Dra. Maria Eduarda</text>
+</svg>
