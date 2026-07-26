@@ -148,6 +148,7 @@ assets/img/           Placeholder da foto
 BRAND.md              Identidade, tom de voz, serviços, pendências
 README.md             Como rodar e como trocar os placeholders
 FRAMER.md             Spec de build no Framer (tokens, breakpoints, CMS, layers)
+FRAMEWORK.md          Playbook portátil: HTML no Claude → Framer via @framer/agent
 framer/               Code components para colar no editor do Framer
 ```
 
